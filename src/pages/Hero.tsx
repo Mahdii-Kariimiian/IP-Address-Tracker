@@ -6,6 +6,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { LatLngTuple } from "leaflet";
 
+// types
 type Data = {
     ip?: string;
     isp?: string;
@@ -56,6 +57,7 @@ const Hero = () => {
             console.error("Error fetching data:", error.message);
         }
     };
+
     // change map view
     const ChangeMapView = ({ center }: { center: LatLngTuple }) => {
         const map = useMap();
@@ -66,8 +68,8 @@ const Hero = () => {
     return (
         <div className="relative flex flex-col max-h-[100dvh] overflow-hidden">
             {/* IP Address tracker */}
-            <section className="z-0 flex flex-col items-center justify-center bg-mobile-bg sm:bg-desktop-bg bg-no-repeat bg-cover pt-5 sm:pt-[40px] pb-[170px] sm:pb-[120px] px-5 space-y-6">
-                <h1 className="text-xl sm:text-3xl text-white font-bold uppercase">
+            <section className="z-0 flex flex-col items-center justify-center bg-mobile-bg sm:bg-desktop-bg bg-no-repeat bg-cover pt-5 sm:pt-[40px] pb-[170px] sm:pb-[105px] px-5 space-y-6">
+                <h1 className="text-xl sm:text-3xl text-white font-bold uppercase whitespace-nowrap">
                     IP Address Tracker
                 </h1>
                 <div className="max-w-[500px] w-full rounded-[15px] overflow-hidden">
@@ -89,7 +91,7 @@ const Hero = () => {
                 </div>
             </section>
             {/* Results */}
-            <section className="z-10 absolute top-[140px] p-2 sm:top-[210px] left-1/2 transform -translate-x-1/2 min-w-[350px] text-center flex max-sm:flex-col item-center sm:items-start sm:justify-between sm:gap-5 bg-white px-3 sm:py-6 rounded-[15px]">
+            <section className="z-10 absolute min-w-[250px] top-[140px] p-2 sm:top-[210px] left-1/2 transform -translate-x-1/2 text-center flex max-sm:flex-col item-center sm:items-start sm:justify-between bg-white sm:py-6 rounded-[15px]">
                 <InfoCard title="IP Address" info={data?.ip} />
                 <InfoCard title="Location" info={data?.location?.country} />
                 <InfoCard title="Timezone" info={data?.location?.timezone} />
