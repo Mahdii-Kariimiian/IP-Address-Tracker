@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { FaAngleRight } from "react-icons/fa";
-import fetchData, { fetchLatLon } from "../config/axios";
+import fetchData, { fetchLatLng } from "../config/axios";
 import InfoCard from "../components/InfoCard ";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+import { LatLngTuple } from "leaflet";
 
 type Data = {
-    [key: string]: string | number | boolean;
+    ip?: string;
+    isp?: string;
     location?: {
         country: string;
         timezone: string;
@@ -17,20 +19,20 @@ const Hero = () => {
     // states
     const [ip, setIP] = useState<string>("");
     const [data, setData] = useState<Data | null>(null);
-    const [latLon, setLatLon] = useState<number[]>([51.505, -0.09]); //
+    const [latLng, setLatLng] = useState<number[]>([51.505, -0.09]);
 
-    console.log(ip, data, latLon);
+    const latLngTuple: LatLngTuple = [latLng[0], latLng[1]];
 
     // Get latitude and longitude from API
     useEffect(() => {
         if (ip) {
-            fetchLatLon("", {
+            fetchLatLng("", {
                 params: {
                     ip: ip,
                 },
             })
                 .then((res) => {
-                    setLatLon([
+                    setLatLng([
                         parseFloat(res.data.latitude),
                         parseFloat(res.data.longitude),
                     ]);
@@ -54,8 +56,8 @@ const Hero = () => {
             console.error("Error fetching data:", error.message);
         }
     };
-
-    const ChangeMapView = ({ center }: { center: number[] }) => {
+    // change map view
+    const ChangeMapView = ({ center }: { center: LatLngTuple }) => {
         const map = useMap();
         map.setView(center, map.getZoom());
         return null;
@@ -96,14 +98,14 @@ const Hero = () => {
             {/* Map */}
             <section className="z-0">
                 <MapContainer
-                    center={latLon}
+                    center={latLngTuple}
                     zoom={13}
                     className="w-full h-[600px]"
                     zoomControl={false}
                 >
-                    <ChangeMapView center={latLon} />
+                    <ChangeMapView center={latLngTuple} />
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    <Marker position={latLon}>
+                    <Marker position={latLngTuple}>
                         <Popup>IP Address Location</Popup>
                     </Marker>
                 </MapContainer>

@@ -8,11 +8,11 @@ const fetchData = axios.create({
     },
 });
 
-const fetchLatLon = axios.create({
+const fetchLatLng = axios.create({
     // ipgeolocation API for getting latitude and longitude
     baseURL:
         "https://api.ipgeolocation.io/ipgeo?apiKey=94f6e5f48c94481891116ef37cd4cefb",
 });
 
 export default fetchData;
-export { fetchLatLon };
+export { fetchLatLng };
