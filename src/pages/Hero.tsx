@@ -1,10 +1,10 @@
+import { LatLngTuple } from "leaflet";
+import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
 import { FaAngleRight } from "react-icons/fa";
-import fetchData, { fetchLatLng } from "../config/axios";
+import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 import InfoCard from "../components/InfoCard ";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import { LatLngTuple } from "leaflet";
+import fetchData, { fetchLatLng } from "../config/axios";
 
 // types
 type Data = {
@@ -21,7 +21,7 @@ const Hero = () => {
     const [ip, setIP] = useState<string>("");
     const [data, setData] = useState<Data | null>(null);
     const [latLng, setLatLng] = useState<number[]>([51.505, -0.09]);
-
+    const [error, setError] = useState<string>("");
     const latLngTuple: LatLngTuple = [latLng[0], latLng[1]];
 
     // Get latitude and longitude from API
@@ -37,12 +37,14 @@ const Hero = () => {
                         parseFloat(res.data.latitude),
                         parseFloat(res.data.longitude),
                     ]);
+                    setError("");
                 })
                 .catch((error) => {
                     console.error("Error fetching lat/lon:", error.message);
+                    setError("This IP doesn't exist");
                 });
         }
-    }, [data]);
+    }, [ip]);
 
     // Get IP from API
     const handleClick = async () => {
@@ -52,9 +54,13 @@ const Hero = () => {
                     ipAddress: ip,
                 },
             });
+            console.log(response.data);
             setData(response.data);
+            setError("");
         } catch (error: any) {
             console.error("Error fetching data:", error.message);
+            setError("This IP doesn't exist");
+            setData(null);
         }
     };
 
@@ -72,6 +78,7 @@ const Hero = () => {
                 <h1 className="text-xl sm:text-3xl text-white font-bold uppercase whitespace-nowrap">
                     IP Address Tracker
                 </h1>
+
                 <div className="max-w-[500px] w-full rounded-[15px] overflow-hidden">
                     <div className="flex items-stretch">
                         <input
@@ -90,12 +97,25 @@ const Hero = () => {
                     </div>
                 </div>
             </section>
+
             {/* Results */}
-            <section className="z-10 absolute min-w-[250px] top-[140px] p-2 sm:top-[210px] left-1/2 transform -translate-x-1/2 text-center flex max-sm:flex-col item-center sm:items-start sm:justify-between bg-white sm:py-6 rounded-[15px]">
-                <InfoCard title="IP Address" info={data?.ip} />
-                <InfoCard title="Location" info={data?.location?.country} />
-                <InfoCard title="Timezone" info={data?.location?.timezone} />
-                <InfoCard title="ISP" info={data?.isp} />
+            <section className="flex flex-col justify-between z-10 absolute min-w-[250px] min-h-44 top-[140px] p-2 sm:top-[210px] left-1/2 transform -translate-x-1/2 text-center bg-white sm:py-6 rounded-[15px]">
+                <div>
+                    {error && (
+                        <div className="text-red-500 font-semibold">
+                            {error}
+                        </div>
+                    )}
+                </div>
+                <div className="flex max-sm:flex-col item-center sm:items-start sm:justify-between">
+                    <InfoCard title="IP Address" info={data?.ip} />
+                    <InfoCard title="Location" info={data?.location?.country} />
+                    <InfoCard
+                        title="Timezone"
+                        info={data?.location?.timezone}
+                    />
+                    <InfoCard title="ISP" info={data?.isp} />
+                </div>
             </section>
             {/* Map */}
             <section className="z-0">
@@ -107,9 +127,7 @@ const Hero = () => {
                 >
                     <ChangeMapView center={latLngTuple} />
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    <Marker position={latLngTuple}>
-                        <Popup>IP Address Location</Popup>
-                    </Marker>
+                    <Marker position={latLngTuple}></Marker>
                 </MapContainer>
             </section>
         </div>
